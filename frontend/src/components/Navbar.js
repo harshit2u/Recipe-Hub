@@ -1,20 +1,109 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  const [hoveredButton, setHoveredButton] = useState(null);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
+  const handleMouseEnter = (buttonName) => {
+    setHoveredButton(buttonName);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredButton(null);
+  };
+
+  const getButtonStyle = (buttonName) => {
+    const baseStyle = styles.navBtn;
+    const hoverStyle = buttonName === 'logout' ? styles.logoutBtnHover : styles.navBtnHover;
+
+    // Apply hover style only if the button is hovered
+    if (hoveredButton === buttonName) {
+      return { ...baseStyle, ...hoverStyle };
+    }
+
+    return baseStyle;
+  };
 
   return (
     <div>
-      {/* Top Navbar */}
       <nav style={styles.topNavbar}>
-        <h1 style={styles.logo} onClick={() => navigate("/")}> 
+        <h1 
+          style={styles.logo} 
+          onClick={() => navigate("/")}>
           Recipe Hub <span style={styles.icon}>🍽️</span>
         </h1>
         <div style={styles.navButtons}>
-          <button style={styles.navBtn} onClick={() => navigate("/about")}>About</button>
-          <button style={styles.navBtn} onClick={() => navigate("/login")}>Login</button>
-          <button style={styles.navBtn} onClick={() => navigate("/signup")}>Signup</button>
+          <button 
+            style={getButtonStyle('about')} 
+            onClick={() => navigate("/about")}
+            onMouseEnter={() => handleMouseEnter('about')}
+            onMouseLeave={handleMouseLeave}
+          >
+            About
+          </button>
+
+          {token ? (
+            <>
+              <button 
+                style={getButtonStyle('home')} 
+                onClick={() => navigate("/")}
+                onMouseEnter={() => handleMouseEnter('home')}
+                onMouseLeave={handleMouseLeave}
+              >
+                Home
+              </button>
+              <button 
+                style={getButtonStyle('new-recipe')} 
+                onClick={() => navigate("/new-recipe")}
+                onMouseEnter={() => handleMouseEnter('new-recipe')}
+                onMouseLeave={handleMouseLeave}
+              >
+                New Recipe?
+              </button>
+              <button 
+                style={getButtonStyle('my-recipes')} 
+                onClick={() => navigate("/my-recipes")}
+                onMouseEnter={() => handleMouseEnter('my-recipes')}
+                onMouseLeave={handleMouseLeave}
+              >
+                My Recipes
+              </button>
+              <button 
+                style={getButtonStyle('logout')} 
+                onClick={handleLogout}
+                onMouseEnter={() => handleMouseEnter('logout')}
+                onMouseLeave={handleMouseLeave}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <button 
+                style={getButtonStyle('login')} 
+                onClick={() => navigate("/login")}
+                onMouseEnter={() => handleMouseEnter('login')}
+                onMouseLeave={handleMouseLeave}
+              >
+                Login
+              </button>
+              <button 
+                style={getButtonStyle('signup')} 
+                onClick={() => navigate("/signup")}
+                onMouseEnter={() => handleMouseEnter('signup')}
+                onMouseLeave={handleMouseLeave}
+              >
+                Signup
+              </button>
+            </>
+          )}
         </div>
       </nav>
     </div>
@@ -45,6 +134,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "10px",
+    transition: "transform 0.3s ease-in-out",
   },
   icon: {
     width: "45px", 
@@ -53,6 +143,7 @@ const styles = {
   navButtons: {
     display: "flex",
     gap: "12px",
+    justifyContent: "flex-end",
   },
   navBtn: {
     background: "#fff",
@@ -63,7 +154,24 @@ const styles = {
     borderRadius: "20px",
     cursor: "pointer",
     fontWeight: "bold",
-    transition: "0.3s ease",
+    transition: "all 0.3s ease-in-out",
+  },
+  navBtnHover: {
+    transform: "scale(1.1)",
+    backgroundColor: "#ff7e5f",
+    color: "#fff",
+  },
+  logoutBtn: {
+    background: "#ff7e5f", // Set a solid background color
+    color: "#fff",
+    borderColor: "#ff7e5f",
+    fontWeight: "bold",
+    transition: "all 0.3s ease-in-out",
+  },
+  logoutBtnHover: {
+    transform: "scale(1.1)",
+    backgroundColor: "#ff4e4e", // Hover color
+    color: "#fff",
   },
 };
 

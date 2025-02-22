@@ -1,18 +1,49 @@
+// Updated Login Component
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login Data:", formData);
-    navigate("/"); // Redirect to homepage after login
+
+    const data = {
+      email: formData.email,
+      password: formData.password,
+    };
+
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      
+      if (response.ok) {
+        // Store the token in localStorage
+        localStorage.setItem('token', result.token);
+        console.log('Login successful');
+        
+        // Redirect to dashboard after successful login
+        navigate('/dashboard');
+      } else {
+        setError(result.message); // Show error message if any
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      setError('Login failed. Please try again.');
+    }
   };
 
   return (
@@ -20,8 +51,23 @@ const Login = () => {
       <div style={styles.card}>
         <h2 style={styles.title}>Login to Your Account</h2>
         <form onSubmit={handleSubmit}>
-          <input type="email" name="email" placeholder="Email" onChange={handleChange} style={styles.input} required />
-          <input type="password" name="password" placeholder="Password" onChange={handleChange} style={styles.input} required />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            onChange={handleChange}
+            style={styles.input}
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            onChange={handleChange}
+            style={styles.input}
+            required
+          />
+          {error && <p style={{ color: "red" }}>{error}</p>}
           <button type="submit" style={styles.button}>Login</button>
         </form>
         <p style={styles.text}>
