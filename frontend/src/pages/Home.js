@@ -47,8 +47,8 @@ function Home() {
         </select>
         <select style={styles.dropdown} value={type} onChange={(e) => setType(e.target.value)}>
           <option>Type All</option>
-          <option>Vegetarian</option>
-          <option>Non-Vegetarian</option>
+          <option>Veg</option>
+          <option>Non-Veg</option>
         </select>
         <input
           type="text"

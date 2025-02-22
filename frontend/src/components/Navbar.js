@@ -61,7 +61,7 @@ const Navbar = () => {
               </button>
               <button 
                 style={getButtonStyle('new-recipe')} 
-                onClick={() => navigate("/new-recipe")}
+                onClick={() => navigate("/create-recipe")}
                 onMouseEnter={() => handleMouseEnter('new-recipe')}
                 onMouseLeave={handleMouseLeave}
               >
@@ -69,7 +69,7 @@ const Navbar = () => {
               </button>
               <button 
                 style={getButtonStyle('my-recipes')} 
-                onClick={() => navigate("/my-recipes")}
+                onClick={() => navigate("/Dashboard")}
                 onMouseEnter={() => handleMouseEnter('my-recipes')}
                 onMouseLeave={handleMouseLeave}
               >

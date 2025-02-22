@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import Navbar from "./components/Navbar";
 import "./App.css"; // Import CSS file
-const cors = require("cors");
 
 // Lazy Load Components
 const Home = lazy(() => import("./pages/Home"));
@@ -16,7 +15,7 @@ const RecipeDetails = lazy(() => import("./pages/RecipeDetails"));
 function App() {
   return (
     <Router>
-      <Navbar />
+      <Navbar /> {/* Place Navbar outside Suspense and Routes */}
       <Suspense fallback={<div className="loading">Loading...</div>}>
         <Routes>
           <Route path="/" element={<Home />} />
