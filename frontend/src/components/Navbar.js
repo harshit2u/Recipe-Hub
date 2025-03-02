@@ -110,18 +110,23 @@ const Navbar = () => {
 };
 
 const styles = {
-  topNavbar: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "10px 90px",
-    height: "70px",
-    background: "linear-gradient(to right,#b8e98b, #eba7bb)",
-    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-    position: "sticky",
-    top: 0,
-    zIndex: 1000,
-  },
+ topNavbar: {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: "10px 90px",
+  height: "70px !important", // Ensure fixed height
+  minHeight: "70px", // Prevents shrinking
+  maxHeight: "70px", // Prevents expanding
+  background: "linear-gradient(to right,#b6ff72, #ffa55c)",
+  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+  position: "sticky",
+  top: 0,
+  zIndex: 1000,
+  overflow: "hidden", // Prevents unintended resizing
+  transition: "none", // Ensure it doesn't animate height changes
+},
+
   logo: {
     fontSize: "50px",
     fontWeight: "bold",
@@ -154,6 +159,8 @@ const styles = {
     cursor: "pointer",
     fontWeight: "bold",
     transition: "all 0.3s ease-in-out",
+    minWidth: "120px",  // Ensure the button size is fixed
+    textAlign: "center",  // Align text in the center
   },
   navBtnHover: {
     transform: "scale(1.1)",
@@ -166,6 +173,7 @@ const styles = {
     borderColor: "#ff7e5f",
     fontWeight: "bold",
     transition: "all 0.3s ease-in-out",
+    minWidth: "120px",  // Same here for consistency
   },
   logoutBtnHover: {
     transform: "scale(1.1)",
@@ -173,5 +181,6 @@ const styles = {
     color: "#fff",
   },
 };
+
 
 export default Navbar;

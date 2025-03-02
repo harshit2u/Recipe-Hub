@@ -43,15 +43,31 @@ exports.createRecipe = async (req, res) => {
   }
 };
 
-// 📌 Get all recipes
+// 📌 Get all recipes for the Home Page (Universal)
 exports.getAllRecipes = async (req, res) => {
   try {
-    const recipes = await Recipe.find().populate("user", "name email");
+    const recipes = await Recipe.find().populate("user", "name email"); // ✅ Fetching all recipes (correct)
     res.status(200).json(recipes);
   } catch (error) {
     res.status(500).json({ message: "Error fetching recipes" });
   }
 };
+
+/// 📌 Get only the logged-in user's recipes (For Dashboard)
+exports.getUserRecipes = async (req, res) => {
+  try {
+    const userId = req.user.id; // Get user ID from token
+    const recipes = await Recipe.find({ user: userId }).populate("user", "name email");
+    
+    res.status(200).json(recipes);
+  } catch (error) {
+    console.error("Error fetching user recipes:", error.message);
+    res.status(500).json({ message: "Error fetching user recipes" });
+  }
+};
+
+
+
 
 // 📌 Get a single recipe by ID
 exports.getRecipeById = async (req, res) => {

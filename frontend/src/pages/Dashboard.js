@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [recipes, setRecipes] = useState([]);
+  const [deletingId, setDeletingId] = useState(null); // Track which recipe is being deleted
   const token = localStorage.getItem("token");
 
   // Redirect to login if no token
@@ -12,36 +14,39 @@ const Dashboard = () => {
       navigate("/login");
       return;
     }
-    fetchRecipes();
+    fetchUserRecipes(); // ✅ Fixed function name
   }, [token, navigate]);
 
-  // Fetch recipes from backend
-  const fetchRecipes = async () => {
+  const fetchUserRecipes = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/recipes", {
+      const token = localStorage.getItem("token"); // Get auth token
+  
+      const response = await fetch("http://localhost:5000/api/recipes/user/recipes", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Send token for authentication
         },
       });
-      const data = await response.json();
-      if (response.ok) {
-        setRecipes(data);
-      } else {
-        console.error("Error fetching recipes:", data.message);
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
+  
+      const data = await response.json();
+      console.log("Fetched user recipes:", data);
+      setRecipes(data); // Update state with fetched recipes
     } catch (error) {
-      console.error("Error fetching recipes:", error);
+      console.error("Error fetching user recipes:", error);
     }
   };
-
-  // Handle Edit Recipe
-  const handleEdit = (id) => {
-    navigate(`/edit-recipe/${id}`);
-  };
+  
 
   // Handle Delete Recipe
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this recipe?")) return;
+
+    // Set the deletingId to disable the button
+    setDeletingId(id);
 
     try {
       const response = await fetch(`http://localhost:5000/api/recipes/${id}`, {
@@ -52,88 +57,66 @@ const Dashboard = () => {
       });
 
       if (response.ok) {
+        // Remove the deleted recipe from the state
         setRecipes(recipes.filter((recipe) => recipe._id !== id));
       } else {
         console.error("Failed to delete recipe");
       }
     } catch (error) {
       console.error("Error deleting recipe:", error);
+    } finally {
+      // Reset deletingId to re-enable the button after deletion
+      setDeletingId(null);
     }
   };
 
   return (
-    <div>
-      <h1>Your Recipes</h1>
-      
+    <div className="container mt-5">
+      <h1 className="text-center mb-4">Your Recipes</h1>
+
       {recipes.length === 0 ? (
-        <p>No recipes found. Start adding some!</p>
+        <p className="text-center">No recipes found. Start adding some!</p>
       ) : (
-        <div style={styles.recipeList}>
+        <ul className="list-group">
           {recipes.map((recipe) => (
-            <div key={recipe._id} style={styles.recipeCard}>
-              <span style={styles.recipeName}>{recipe.name}</span>
-              <img
-                src={recipe.image || "https://via.placeholder.com/150"}
-                alt={recipe.name}
-                style={styles.recipeImage}
-              />
-              <button onClick={() => handleEdit(recipe._id)} style={styles.editButton}>Edit</button>
-              <button onClick={() => handleDelete(recipe._id)} style={styles.deleteButton}>🗑️</button>
-            </div>
+            <li key={recipe._id} className="list-group-item d-flex justify-content-between align-items-center shadow-sm mb-3">
+              <div className="d-flex align-items-center">
+                <img
+                  src={recipe.image || "https://via.placeholder.com/150"}
+                  alt={recipe.name}
+                  className="rounded-circle me-3"
+                  style={{ width: "60px", height: "60px", objectFit: "cover" }}
+                />
+                <div>
+                  <h5 className="mb-1">{recipe.name}</h5>
+                  <small className="text-muted">{recipe.category}</small>
+                </div>
+              </div>
+
+              {/* Conditionally render button */}
+              {deletingId === recipe._id ? (
+                <button
+                  className="btn btn-danger btn-sm disabled"
+                  disabled
+                >
+                  <div className="spinner-border spinner-border-sm" role="status">
+                    <span className="visually-hidden">Deleting...</span>
+                  </div> Deleting
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleDelete(recipe._id)}
+                  className="btn btn-danger btn-sm"
+                >
+                  Delete
+                </button>
+              )}
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );
-};
-
-// Styling
-const styles = {
-  recipeList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "15px",
-    marginTop: "20px",
-  },
-  recipeCard: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "15px",
-    background: "#fff",
-    borderRadius: "10px",
-    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-    gap: "15px",
-  },
-  recipeName: {
-    fontSize: "18px",
-    fontWeight: "bold",
-    color: "#333",
-    flex: 1,
-  },
-  recipeImage: {
-    width: "50px",
-    height: "50px",
-    objectFit: "cover",
-    borderRadius: "5px",
-  },
-  editButton: {
-    backgroundColor: "#4CAF50",
-    color: "#fff",
-    padding: "10px 20px",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
-  deleteButton: {
-    backgroundColor: "#F44336",
-    color: "#fff",
-    padding: "10px 15px",
-    border: "none",
-    borderRadius: "50%",
-    cursor: "pointer",
-    fontSize: "18px",
-  },
 };
 
 export default Dashboard;
