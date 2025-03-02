@@ -1,10 +1,22 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const recipeController = require('../controllers/recipeController');  // Import your controller
-const { protect } = require('../middleware/authMiddleware'); // Import protect middleware
+const recipeController = require("../routes/recipeController");
+const { protect } = require("../middleware/authMiddleware");
+const upload = require("../middleware/upload"); // Multer middleware for Cloudinary uploads
 
-// Define the route to create a recipe, with protect middleware to secure it
-router.post('/create', protect, recipeController.createRecipe);  // Protect the route
+// ✅ Fixed: Keep only one POST /create route
+router.post("/create", protect, upload.single("image"), recipeController.createRecipe);
 
-// Export the router
+// Get all recipes
+router.get("/", recipeController.getAllRecipes);
+
+// Get a single recipe by ID
+router.get("/:id", recipeController.getRecipeById);
+
+// Update a recipe by ID (protected)
+router.put("/:id", protect, upload.single("image"), recipeController.updateRecipe);
+
+// Delete a recipe by ID (protected)
+router.delete("/:id", protect, recipeController.deleteRecipe);
+
 module.exports = router;
