@@ -19,10 +19,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // Enable CORS with specific configuration
 app.use(cors({
-    origin: 'http://localhost:3000',  
+    origin: ['http://localhost:3000', 'https://recipe-hub-frontend.onrender.com'],  
     methods: 'GET,POST,PUT,DELETE',
-    credentials: true,  
+    credentials: true  
 }));
+
 
 // Use the routes
 app.use('/api/auth', authRoutes);  
