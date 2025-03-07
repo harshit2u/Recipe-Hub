@@ -56,5 +56,6 @@ For any inquiries, reach out at [vu1f2223083@pvppcoe.ac.in].
 
 
 ------------Deployed---------------
+
 frontend- https://recipe-hub-frontend.onrender.com
 backend- https://recipe-hub-frontend.onrender.com
